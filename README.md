@@ -45,7 +45,7 @@ This project is a Money Tracker application that helps users monitor their finan
 
    Before starting the application, you can optionally pre-populate your MongoDB database with 10 sample transactions.
    To do this open your web browser and navigate to http://localhost:27000/insert_many/
-   and that it, the database now has 10 sample transactions !
+   and that's it, the database now has 10 sample transactions !
 4. **Open Money Tracker in your Browser:**
 
   Once the application is running, open your web browser and navigate to http://localhost:3000
