@@ -1,0 +1,56 @@
+version: '3.8'
+
+volumes:
+  mongo-data: {} 
+  
+services:
+  dbmongo:
+    build:
+      context: ./mongoDb
+      dockerfile: Dockerfile
+    networks:
+      - money-tracker-network 
+    ports:
+      - "8003:27017" 
+    volumes:
+      - mongo-data:/data/db
+
+  mongodb_code:
+    build:
+      context: ./mongoCode
+      dockerfile: Dockerfile
+    container_name: asaf_mongocode
+    ports:
+      - "27000:27000"
+    depends_on:
+      - dbmongo
+    networks:
+      - money-tracker-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - dbmongo
+      - mongodb_code
+    networks:
+      - money-tracker-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - dbmongo
+      - mongodb_code
+      - backend
+    networks:
+      - money-tracker-network
+
+networks:
+  money-tracker-network: 

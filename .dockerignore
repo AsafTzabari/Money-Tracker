@@ -1,0 +1,7 @@
+env/
+__pycahcce__/
+
+* .gitignore
+*.env
+*.env.*
+env.*
