@@ -1,49 +1,53 @@
 services:
   - name: dbmongo
+    type: docker
     env: 
       - name: MONGO_INITDB_ROOT_USERNAME
         value: root
       - name: MONGO_INITDB_ROOT_PASSWORD
         value: root
-    dockerfile: ./mongoDb/Dockerfile
+    buildCommand: docker build -t dbmongo ./mongoDb
+    startCommand: docker-entrypoint.sh mongod --bind_ip_all
     ports:
       - 8003:27017
     volumes:
       - name: mongo-data
         path: /data/db
-    start_command: ["docker-entrypoint.sh", "mongod", "--bind_ip_all"]
 
   - name: mongodb_code
-    dockerfile: ./mongoCode/Dockerfile
+    type: docker
+    buildCommand: docker build -t mongodb_code ./mongoCode
     env:
       - name: MONGO_URI
-        from_secret: dbmongo-uri
+        fromSecret: dbmongo-uri
+    startCommand: npm start
     ports:
       - 27000:27000
-    start_command: ["npm", "start"]
 
   - name: backend
-    dockerfile: ./backend/Dockerfile
+    type: docker
+    buildCommand: docker build -t backend ./backend
     env:
       - name: MONGO_URI
-        from_secret: dbmongo-uri
+        fromSecret: dbmongo-uri
       - name: MONGO_DB
         value: <YOUR_MONGO_DB>
+    startCommand: npm start
     ports:
       - 8000:8000
-    start_command: ["npm", "start"]
 
   - name: frontend
-    dockerfile: ./frontend/Dockerfile
+    type: docker
+    buildCommand: docker build -t frontend ./frontend
+    startCommand: npm start
     ports:
       - 3000:3000
-    start_command: ["npm", "start"]
 
 volumes:
   - name: mongo-data
 
 secrets:
   - name: dbmongo-uri
-    from_service:
+    fromService:
       name: dbmongo
       alias: MONGO_URI
