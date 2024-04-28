@@ -10,8 +10,7 @@ services:
         value: root  
       - key: MONGO_INITDB_ROOT_PASSWORD
         value: root
-    ports:
-      - 8003:27017
+    port : 8003
 
   - name: mongodb_code 
     type: worker
