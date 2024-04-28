@@ -9,30 +9,27 @@ services:
         value: root
     ports:
       - 8003:27017
-    
+
   - type: web
     name: mongodb_code
     dockerfilePath: ./mongoCode/Dockerfile
-    envFrom: 
-      - service:dbmongo
-        type: secret
+    envFrom:
+      - service: dbmongo
     ports:
       - 27000:27000
-    
-  - type: web  
+
+  - type: web
     name: backend
     dockerfilePath: ./backend/Dockerfile
     envFrom:
-      - service:dbmongo
-        type: secret  
+      - service: dbmongo
     ports:
       - 8000:8000
-    
+
   - type: web
-    name: frontend 
+    name: frontend
     dockerfilePath: ./frontend/Dockerfile
     envFrom:
-      - service:dbmongo
-        type: secret
+      - service: dbmongo
     ports:
       - 3000:3000
