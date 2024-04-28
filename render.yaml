@@ -1,53 +1,60 @@
 services:
   - name: dbmongo
-    type: docker
-    env: 
-      - name: MONGO_INITDB_ROOT_USERNAME
+    type: web
+    env: docker
+    repo: https://github.com/your-repo/your-project
+    dockerContext: ./mongoDb
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGO_INITDB_ROOT_USERNAME
+        value: root  
+      - key: MONGO_INITDB_ROOT_PASSWORD
         value: root
-      - name: MONGO_INITDB_ROOT_PASSWORD
-        value: root
-    buildCommand: docker build -t dbmongo ./mongoDb
-    startCommand: docker-entrypoint.sh mongod --bind_ip_all
     ports:
       - 8003:27017
-    volumes:
-      - name: mongo-data
-        path: /data/db
 
-  - name: mongodb_code
-    type: docker
-    buildCommand: docker build -t mongodb_code ./mongoCode
-    env:
-      - name: MONGO_URI
-        fromSecret: dbmongo-uri
-    startCommand: npm start
+  - name: mongodb_code 
+    type: worker
+    env: docker
+    repo: https://github.com/your-repo/your-project  
+    dockerContext: ./mongoCode
+    dockerfilePath: Dockerfile
     ports:
       - 27000:27000
+    envVars:
+      - key: MONGO_CONNECTION_STRING
+        fromService:
+          name: dbmongo
+          property: connectionString
 
   - name: backend
-    type: docker
-    buildCommand: docker build -t backend ./backend
-    env:
-      - name: MONGO_URI
-        fromSecret: dbmongo-uri
-      - name: MONGO_DB
-        value: <YOUR_MONGO_DB>
+    type: web  
+    buildCommand: npm install
     startCommand: npm start
+    repo: https://github.com/your-repo/your-project
+    dockerContext: ./backend
+    dockerfilePath: Dockerfile
     ports:
       - 8000:8000
+    envVars:
+      - key: MONGO_CONNECTION_STRING  
+        fromService:
+          name: dbmongo
+          property: connectionString
 
-  - name: frontend
-    type: docker
-    buildCommand: docker build -t frontend ./frontend
+  - name: frontend  
+    type: web
+    buildCommand: npm install  
     startCommand: npm start
+    repo: https://github.com/your-repo/your-project
+    dockerContext: ./frontend  
+    dockerfilePath: Dockerfile
     ports:
       - 3000:3000
+    envVars:
+      - key: API_URL
+        fromService:
+          name: backend
+          property: hostport
 
-volumes:
-  - name: mongo-data
-
-secrets:
-  - name: dbmongo-uri
-    fromService:
-      name: dbmongo
-      alias: MONGO_URI
+databases: []
