@@ -1,49 +1,41 @@
 services:
   - name: dbmongo
-    env: 
-      - name: MONGO_INITDB_ROOT_USERNAME
-        value: root
-      - name: MONGO_INITDB_ROOT_PASSWORD
-        value: root
-    dockerfile: ./mongoDb/Dockerfile
-    ports:
-      - 8003:27017
+    env: docker
+    dockerfilePath: ./mongoDb/Dockerfile
+    containerPorts:
+      - 27017
     volumes:
-      - name: mongo-data
-        path: /data/db
-    start_command: ["docker-entrypoint.sh", "mongod", "--bind_ip_all"]
+      - mongodb-data:/data/db
 
   - name: mongodb_code
-    dockerfile: ./mongoCode/Dockerfile
-    env:
-      - name: MONGO_URI
-        from_secret: dbmongo-uri
-    ports:
-      - 27000:27000
-    start_command: ["npm", "start"]
+    env: docker
+    dockerfilePath: ./mongoCode/Dockerfile
+    containerPorts:
+      - 27000
+    dependsOn:
+      - dbmongo
 
   - name: backend
-    dockerfile: ./backend/Dockerfile
-    env:
-      - name: MONGO_URI
-        from_secret: dbmongo-uri
-      - name: MONGO_DB
-        value: <YOUR_MONGO_DB>
-    ports:
-      - 8000:8000
-    start_command: ["npm", "start"]
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    containerPorts:
+      - 8000
+    dependsOn:
+      - dbmongo
+      - mongodb_code
 
   - name: frontend
-    dockerfile: ./frontend/Dockerfile
-    ports:
-      - 3000:3000
-    start_command: ["npm", "start"]
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    containerPorts:
+      - 3000
+    dependsOn:
+      - dbmongo
+      - mongodb_code
+      - backend
 
 volumes:
-  - name: mongo-data
+  - name: mongodb-data
 
-secrets:
-  - name: dbmongo-uri
-    from_service:
-      name: dbmongo
-      alias: MONGO_URI
+networks:
+  - name: money-tracker-network
