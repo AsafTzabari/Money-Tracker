@@ -1,45 +1,38 @@
 services:
-  - type: redis
+  - type: mongodb
     name: dbmongo
-    env: docker
     dockerfilePath: ./mongoDb/Dockerfile
-    containerPorts:
-      - 27017
-    volumes:
-      - mongodb-data:/data/db
-
+    env:
+      - key: MONGO_INITDB_ROOT_USERNAME
+        value: root
+      - key: MONGO_INITDB_ROOT_PASSWORD
+        value: root
+    ports:
+      - 8003:27017
+    
   - type: web
     name: mongodb_code
-    env: docker
     dockerfilePath: ./mongoCode/Dockerfile
-    containerPorts:
-      - 27000
-    dependsOn:
-      - dbmongo
-
-  - type: web
+    envFrom: 
+      - service:dbmongo
+        type: secret
+    ports:
+      - 27000:27000
+    
+  - type: web  
     name: backend
-    env: docker
     dockerfilePath: ./backend/Dockerfile
-    containerPorts:
-      - 8000
-    dependsOn:
-      - dbmongo
-      - mongodb_code
-
+    envFrom:
+      - service:dbmongo
+        type: secret  
+    ports:
+      - 8000:8000
+    
   - type: web
-    name: frontend
-    env: docker
+    name: frontend 
     dockerfilePath: ./frontend/Dockerfile
-    containerPorts:
-      - 3000
-    dependsOn:
-      - dbmongo
-      - mongodb_code
-      - backend
-
-volumes:
-  - name: mongodb-data
-
-networks:
-  - name: money-tracker-network
+    envFrom:
+      - service:dbmongo
+        type: secret
+    ports:
+      - 3000:3000
