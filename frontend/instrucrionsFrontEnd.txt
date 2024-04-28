@@ -1,5 +1,0 @@
-build docker:
-docker build . -t <image name>
-
-run docker:
-docker run -d -p 3000:3000 <image name>
