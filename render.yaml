@@ -1,5 +1,5 @@
 services:
-  - type: mongodb
+  - type: redis
     name: dbmongo
     dockerfilePath: ./mongoDb/Dockerfile
     env:
