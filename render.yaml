@@ -1,6 +1,5 @@
 services:
-  - type: redis
-    name: dbmongo
+  - name: dbmongo
     env: docker
     dockerfilePath: ./mongoDb/Dockerfile
     containerPorts:
@@ -8,8 +7,7 @@ services:
     volumes:
       - mongodb-data:/data/db
 
-  - type: web
-    name: mongodb_code
+  - name: mongodb_code
     env: docker
     dockerfilePath: ./mongoCode/Dockerfile
     containerPorts:
@@ -17,8 +15,7 @@ services:
     dependsOn:
       - dbmongo
 
-  - type: web
-    name: backend
+  - name: backend
     env: docker
     dockerfilePath: ./backend/Dockerfile
     containerPorts:
@@ -27,8 +24,7 @@ services:
       - dbmongo
       - mongodb_code
 
-  - type: web
-    name: frontend
+  - name: frontend
     env: docker
     dockerfilePath: ./frontend/Dockerfile
     containerPorts:
