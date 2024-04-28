@@ -2,16 +2,14 @@ services:
   - name: dbmongo
     type: redis
     env:
-      - key: MONGO_INITDB_ROOT_USERNAME
-        value: root
-      - key: MONGO_INITDB_ROOT_PASSWORD
-        value: root
-    disk:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    persistentDisk:
       name: mongo-data
       mountPath: /data/db
       sizeGB: 1
-    
-  - name: mongodb_code  
+
+  - name: mongodb_code
     type: web
     env: docker
     dockerfilePath: ./mongoCode/Dockerfile
@@ -19,11 +17,9 @@ services:
       - fromService:
           name: dbmongo
           property: MONGO_INITDB_ROOT_USERNAME
-          value: root
       - fromService:
           name: dbmongo
           property: MONGO_INITDB_ROOT_PASSWORD
-          value: root
     ports:
       - 27000:27000
 
@@ -35,26 +31,22 @@ services:
       - fromService:
           name: dbmongo
           property: MONGO_INITDB_ROOT_USERNAME
-          value: root
       - fromService:
-          name: dbmongo
+          name: dbmongo  
           property: MONGO_INITDB_ROOT_PASSWORD
-          value: root
     ports:
       - 8000:8000
-      
+
   - name: frontend
-    type: web  
+    type: web
     env: docker
     dockerfilePath: ./frontend/Dockerfile
     envVars:
       - fromService:
           name: dbmongo
           property: MONGO_INITDB_ROOT_USERNAME
-          value: root
       - fromService:
           name: dbmongo
           property: MONGO_INITDB_ROOT_PASSWORD
-          value: root
     ports:
       - 3000:3000
